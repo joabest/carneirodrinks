@@ -130,6 +130,7 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
         <img
           src="/hero-reference.webp"
           alt="Bebidas geladas no gelo"
+          onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = settings.hero_image; }}
           className="absolute bottom-0 left-0 h-[235px] w-full object-cover object-center opacity-95 [filter:saturate(1.06)_contrast(1.04)_brightness(.92)] sm:h-[255px] md:bottom-auto md:left-auto md:right-0 md:top-0 md:h-full md:w-[61%]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,#070303_0%,#080303_45%,rgba(8,3,3,.35)_66%,rgba(0,0,0,.15)_100%)] md:bg-[linear-gradient(90deg,#050202_0%,#080303_38%,rgba(8,3,3,.78)_51%,rgba(8,3,3,.10)_76%,rgba(0,0,0,.06)_100%)]" />
