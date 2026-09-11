@@ -32,7 +32,7 @@ export const demoSettings: StoreSettings = {
   link99: "https://99app.com/",
   instagram: "https://instagram.com/",
   address: "Rua Olga Artacho, 349 - Jardim Piratininga",
-  hours: "Todos os dias, 19h às 05h",
+  hours: "Domingo: 19h às 05h • Segunda: 19h às 05h • Terça: fechado • Quarta a sábado: 19h às 05h",
   delivery_region: "Zona Leste de São Paulo e região",
   min_order: "R$ 30,00"
 };
