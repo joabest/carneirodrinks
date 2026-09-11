@@ -205,7 +205,7 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
 
       <footer className="border-t border-white/5 bg-[#070404] py-10">
         <div className="container-site grid gap-8 md:grid-cols-3">
-          <div><div className="text-xl font-black uppercase">Carneiro <span className="text-[#d0102f]">Drinks</span></div><p className="mt-3 max-w-sm text-sm leading-6 text-white/45">Delivery de bebidas com compra rápida pelo WhatsApp ou pela 99.</p></div>
+          <div><div className="text-xl font-black uppercase">Carneiro <span className="text-[#d0102f]">Drinks</span></div><p className="mt-3 max-w-sm text-sm leading-6 text-white/45">Delivery de bebidas com compra rápida pelo WhatsApp ou pela 99.</p><p className="mt-3 text-[11px] font-bold uppercase tracking-wider text-white/30">Venda proibida para menores de 18 anos.</p></div>
           <div><div className="text-sm font-black uppercase">Atendimento</div><p className="mt-3 text-sm leading-6 text-white/45">{settings.hours}<br/>{settings.address}</p></div>
           <div className="flex items-start gap-3 md:justify-end"><a href={settings.instagram} target="_blank" rel="noreferrer" className="grid h-11 w-11 place-items-center rounded-full border border-white/10 hover:bg-white/5"><Instagram size={19}/></a><button onClick={() => window.open("https://wa.me/" + (settings.whatsapp || "").replace(/\D/g, ""), "_blank")} className="grid h-11 w-11 place-items-center rounded-full border border-white/10 hover:bg-white/5"><MessageCircle size={19}/></button></div>
         </div>
