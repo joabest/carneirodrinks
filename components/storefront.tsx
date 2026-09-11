@@ -145,15 +145,20 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
         </div>
       </section>
 
-      <section className="relative z-20 -mt-0 px-3 sm:px-4">
-        <div className="mx-auto max-w-[990px] overflow-x-auto rounded-2xl bg-white p-1.5 text-black shadow-[0_14px_45px_rgba(0,0,0,.45)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <div className="flex min-w-max items-stretch">
-            {categories.map(([name, icon]) => (
-              <button key={name} onClick={() => goCatalog(name)} className={"group min-w-[72px] rounded-xl px-2 py-2 text-center transition sm:min-w-[76px] " + (category === name ? "bg-[#fff0f2] text-[#ff1838]" : "hover:bg-[#f7f7f7]")}>
-                <span className="block text-[20px]">{icon}</span>
-                <span className={"mt-1 block text-[11px] font-semibold " + (category === name ? "border-b-2 border-[#ff1838] pb-1" : "")}>{name}</span>
-              </button>
-            ))}
+      <section className="relative z-20 px-3 sm:px-4">
+        <div className="mx-auto max-w-[990px] overflow-x-auto rounded-2xl shadow-[0_14px_45px_rgba(0,0,0,.45)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="relative min-w-[990px] overflow-hidden rounded-2xl bg-white">
+            <img src="/categories-reference.webp" alt="Categorias de bebidas Carneiro Drinks" className="block h-auto w-full select-none" draggable={false} />
+            <div className="absolute inset-0 grid grid-cols-13">
+              {categories.map(([name]) => (
+                <button
+                  key={name}
+                  onClick={() => goCatalog(name)}
+                  aria-label={"Ver " + name}
+                  className="h-full w-full bg-transparent"
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
