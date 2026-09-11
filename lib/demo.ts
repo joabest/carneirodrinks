@@ -27,7 +27,7 @@ export const demoProducts: StoreProduct[] = [
 export const demoSettings: StoreSettings = {
   hero_title: "Seu rolê começa aqui.",
   hero_subtitle: "Bebidas geladas, combos e entrega rápida. Escolha, adicione ao carrinho e peça pelo WhatsApp ou pela 99.",
-  hero_image: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1800&q=85",
+  hero_image: "https://images.unsplash.com/photo-1774403269113-43095738ff07?auto=format&fit=crop&fm=jpg&q=82&w=1800",
   whatsapp: "5511999999999",
   link99: "https://99app.com/",
   instagram: "https://instagram.com/",
