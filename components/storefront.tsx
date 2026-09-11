@@ -77,7 +77,7 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
       <header className="sticky top-0 z-40 border-b border-white/5 bg-[#0a0605]/90 backdrop-blur-xl">
         <div className="container-site flex h-16 items-center justify-between gap-3">
           <a href="#" className="flex items-center" aria-label="Carneiro Drinks - início">
-            <img src="/carneiro-drinks-logo.svg" alt="Carneiro Drinks" className="h-14 w-auto object-contain drop-shadow-[0_0_12px_rgba(208,16,47,.24)]" />
+            <img src="/carneiro-drinks-logo-v2.svg" alt="Carneiro Drinks" className="h-14 w-auto object-contain drop-shadow-[0_0_12px_rgba(208,16,47,.24)]" />
           </a>
           <div className="hidden items-center gap-2 text-xs text-white/70 md:flex"><MapPin size={16} className="text-[#d0102f]" /> {settings.delivery_region}</div>
           <nav className="hidden items-center gap-6 text-sm font-bold md:flex">
@@ -208,7 +208,7 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
 
       <footer className="border-t border-white/5 bg-[#070404] py-10">
         <div className="container-site grid gap-8 md:grid-cols-3">
-          <div><img src="/carneiro-drinks-logo.svg" alt="Carneiro Drinks" className="h-28 w-auto object-contain" /><p className="mt-3 max-w-sm text-sm leading-6 text-white/45">Delivery de bebidas com compra rápida pelo WhatsApp ou pela 99.</p><p className="mt-3 text-[11px] font-bold uppercase tracking-wider text-white/30">Venda proibida para menores de 18 anos.</p></div>
+          <div><img src="/carneiro-drinks-logo-v2.svg" alt="Carneiro Drinks" className="h-28 w-auto object-contain" /><p className="mt-3 max-w-sm text-sm leading-6 text-white/45">Delivery de bebidas com compra rápida pelo WhatsApp ou pela 99.</p><p className="mt-3 text-[11px] font-bold uppercase tracking-wider text-white/30">Venda proibida para menores de 18 anos.</p></div>
           <div><div className="text-sm font-black uppercase">Atendimento</div><p className="mt-3 text-sm leading-6 text-white/45">{settings.hours}<br/>{settings.address}</p></div>
           <div className="flex items-start gap-3 md:justify-end"><a href={settings.instagram} target="_blank" rel="noreferrer" className="grid h-11 w-11 place-items-center rounded-full border border-white/10 hover:bg-white/5"><Instagram size={19}/></a><button onClick={() => window.open("https://wa.me/" + (settings.whatsapp || "").replace(/\D/g, ""), "_blank")} className="grid h-11 w-11 place-items-center rounded-full border border-white/10 hover:bg-white/5"><MessageCircle size={19}/></button></div>
         </div>
