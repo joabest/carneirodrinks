@@ -5,9 +5,9 @@ export const metadata: Metadata = {
   title: "Carneiro Drinks | Delivery de Bebidas",
   description: "Bebidas geladas, combos e promoções com pedido rápido pelo WhatsApp ou 99.",
   icons: {
-    icon: "https://raw.githubusercontent.com/joabest/carneirodrinks/test/public/carneiro-drinks-logo.svg",
-    shortcut: "https://raw.githubusercontent.com/joabest/carneirodrinks/test/public/carneiro-drinks-logo.svg",
-    apple: "https://raw.githubusercontent.com/joabest/carneirodrinks/test/public/carneiro-drinks-logo.svg",
+    icon: "/carneiro-drinks-logo.svg",
+    shortcut: "/carneiro-drinks-logo.svg",
+    apple: "/carneiro-drinks-logo.svg",
   },
 };
 
