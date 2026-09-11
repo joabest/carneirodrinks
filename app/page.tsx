@@ -25,7 +25,7 @@ async function loadStore() {
     }));
     const settings: StoreSettings = { ...demoSettings };
     for (const s of settingRows) settings[s.key] = s.value;
-    return { products: products.length ? products : demoProducts, settings };
+    return { products, settings };
   } catch (error) {
     console.error("Falha ao carregar banco. Usando catálogo demonstrativo.", error);
     return { products: demoProducts, settings: demoSettings };
