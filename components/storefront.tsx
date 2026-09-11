@@ -170,16 +170,16 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
         </div>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
           {filtered.map((product) => (
-            <article key={product.id} className="card overflow-hidden rounded-2xl">
-              <div className="relative aspect-[1/1] overflow-hidden bg-black/30">
-                <img src={product.image} alt={product.name} className="h-full w-full object-cover transition duration-500 hover:scale-105"/>
+            <article key={product.id} className="overflow-hidden rounded-2xl border border-black/5 bg-white text-[#111] shadow-[0_8px_30px_rgba(0,0,0,.18)]">
+              <div className="relative aspect-[1/1] overflow-hidden bg-white p-3">
+                <img src={product.image} alt={product.name} loading="lazy" className="h-full w-full object-contain object-center transition duration-500 hover:scale-[1.03]" onError={(e) => { e.currentTarget.src = "/carneiro-drinks-logo-v2.svg"; e.currentTarget.className = "h-full w-full object-contain object-center p-8"; }} />
                 {!product.available && <div className="absolute inset-0 grid place-items-center bg-black/70"><span className="rounded-full bg-white/10 px-3 py-1 text-xs font-black">Indisponível</span></div>}
                 {product.promoPrice && <span className="absolute left-2 top-2 rounded-full bg-[#d0102f] px-2.5 py-1 text-[10px] font-black uppercase">Promo</span>}
               </div>
               <div className="p-3.5 md:p-4">
-                <div className="text-[10px] font-black uppercase tracking-wider text-[#e83a54]">{product.category}</div>
-                <h3 className="mt-1 min-h-10 text-sm font-black leading-5 md:text-base">{product.name}</h3>
-                <p className="mt-1 line-clamp-2 min-h-8 text-[11px] leading-4 text-white/45">{product.description}</p>
+                <div className="text-[10px] font-black uppercase tracking-wider text-[#d0102f]">{product.category}</div>
+                <h3 className="mt-1 min-h-10 text-sm font-black leading-5 text-[#111] md:text-base">{product.name}</h3>
+                <p className="mt-1 line-clamp-2 min-h-8 text-[11px] leading-4 text-black/50">{product.description}</p>
                 <div className="mt-4 flex items-end justify-between gap-2">
                   <div>{product.promoPrice && <div className="text-[10px] text-black/35 line-through">{money(product.price)}</div>}<div className="text-base font-black text-[#111] md:text-lg">{money(product.promoPrice ?? product.price)}</div></div>
                   <button disabled={!product.available} onClick={() => add(product)} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#d0102f] disabled:cursor-not-allowed disabled:opacity-30"><Plus size={18}/></button>
