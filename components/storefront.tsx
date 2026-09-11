@@ -75,9 +75,9 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
   return (
     <main className="min-h-screen pb-20 md:pb-0">
       <header className="sticky top-0 z-40 border-b border-white/5 bg-[#0a0605]/90 backdrop-blur-xl">
-        <div className="container-site flex h-16 items-center justify-between gap-3">
+        <div className="container-site flex h-20 items-center justify-between gap-3">
           <a href="#" className="flex items-center" aria-label="Carneiro Drinks - início">
-            <img src="/carneiro-drinks-logo-v2.svg" alt="Carneiro Drinks" className="h-14 w-auto object-contain drop-shadow-[0_0_12px_rgba(208,16,47,.24)]" />
+            <img src="/carneiro-drinks-logo-v2.svg" alt="Carneiro Drinks" width={180} height={162} className="h-[68px] w-auto max-w-[150px] object-contain object-center drop-shadow-[0_0_12px_rgba(208,16,47,.24)] md:max-w-[170px]" />
           </a>
           <div className="hidden items-center gap-2 text-xs text-white/70 md:flex"><MapPin size={16} className="text-[#d0102f]" /> {settings.delivery_region}</div>
           <nav className="hidden items-center gap-6 text-sm font-bold md:flex">
