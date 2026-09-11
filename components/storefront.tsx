@@ -94,7 +94,7 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
 
       <section className="relative overflow-hidden border-b border-white/5">
         <div className="absolute inset-0">
-          <img src={settings.hero_image} alt="Carneiro Drinks" className="h-full w-full object-cover opacity-30" />
+          <img src={settings.hero_image} alt="Bebidas geladas Carneiro Drinks" className="h-full w-full object-cover object-[65%_center] opacity-55" onError={(e) => { e.currentTarget.src = "/carneiro-drinks-logo-v2.svg"; e.currentTarget.className = "h-full w-full object-contain p-16 opacity-30"; }} />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,#0a0605_5%,rgba(10,6,5,.92)_42%,rgba(10,6,5,.35)_100%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_25%,rgba(208,16,47,.25),transparent_30%)]" />
         </div>
@@ -137,7 +137,7 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {featured.map((product, index) => (
             <article key={product.id} className={(index === 0 ? "md:col-span-2 " : "") + "card group relative min-h-[310px] overflow-hidden rounded-[26px]"}>
-              <img src={product.image} alt={product.name} className="absolute inset-0 h-full w-full object-cover opacity-50 transition duration-500 group-hover:scale-105" />
+              <img src={product.image} alt={product.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover object-center opacity-55 transition duration-500 group-hover:scale-105" onError={(e) => { e.currentTarget.src = "/carneiro-drinks-logo-v2.svg"; e.currentTarget.className = "absolute inset-0 h-full w-full object-contain p-10 opacity-35"; }} />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a0605] via-[#0a0605]/55 to-transparent" />
               {product.promoPrice && <span className="absolute left-4 top-4 rounded-full bg-[#d0102f] px-3 py-1 text-[11px] font-black uppercase">Oferta</span>}
               <div className="absolute inset-x-0 bottom-0 p-5">
@@ -181,7 +181,7 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
                 <h3 className="mt-1 min-h-10 text-sm font-black leading-5 md:text-base">{product.name}</h3>
                 <p className="mt-1 line-clamp-2 min-h-8 text-[11px] leading-4 text-white/45">{product.description}</p>
                 <div className="mt-4 flex items-end justify-between gap-2">
-                  <div>{product.promoPrice && <div className="text-[10px] text-white/35 line-through">{money(product.price)}</div>}<div className="text-base font-black md:text-lg">{money(product.promoPrice ?? product.price)}</div></div>
+                  <div>{product.promoPrice && <div className="text-[10px] text-black/35 line-through">{money(product.price)}</div>}<div className="text-base font-black text-[#111] md:text-lg">{money(product.promoPrice ?? product.price)}</div></div>
                   <button disabled={!product.available} onClick={() => add(product)} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#d0102f] disabled:cursor-not-allowed disabled:opacity-30"><Plus size={18}/></button>
                 </div>
               </div>
@@ -193,7 +193,7 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
 
       <section id="entrega" className="container-site pb-14 pt-4">
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="card rounded-3xl p-6"><Clock3 className="text-[#d0102f]"/><h3 className="mt-5 font-black uppercase">Horário</h3><p className="mt-2 text-sm leading-6 text-white/55">{settings.hours}</p></div>
+          <div className="card rounded-3xl p-6"><Clock3 className="text-[#d0102f]"/><h3 className="mt-5 font-black uppercase">Horário</h3><div className="mt-2 space-y-1 text-sm leading-6 text-white/55">{settings.hours.split("•").map((line) => <p key={line.trim()}>{line.trim()}</p>)}</div></div>
           <div className="card rounded-3xl p-6"><Truck className="text-[#d0102f]"/><h3 className="mt-5 font-black uppercase">Entrega</h3><p className="mt-2 text-sm leading-6 text-white/55">{settings.delivery_region}<br/>Pedido mínimo: {settings.min_order}</p></div>
           <div className="card rounded-3xl p-6"><MapPin className="text-[#d0102f]"/><h3 className="mt-5 font-black uppercase">Endereço</h3><p className="mt-2 text-sm leading-6 text-white/55">{settings.address}</p></div>
         </div>
@@ -208,8 +208,8 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
 
       <footer className="border-t border-white/5 bg-[#070404] py-10">
         <div className="container-site grid gap-8 md:grid-cols-3">
-          <div><img src="/carneiro-drinks-logo-v2.svg" alt="Carneiro Drinks" className="h-28 w-auto object-contain" /><p className="mt-3 max-w-sm text-sm leading-6 text-white/45">Delivery de bebidas com compra rápida pelo WhatsApp ou pela 99.</p><p className="mt-3 text-[11px] font-bold uppercase tracking-wider text-white/30">Venda proibida para menores de 18 anos.</p></div>
-          <div><div className="text-sm font-black uppercase">Atendimento</div><p className="mt-3 text-sm leading-6 text-white/45">{settings.hours}<br/>{settings.address}</p></div>
+          <div><img src="/carneiro-drinks-logo-v2.svg" alt="Carneiro Drinks" width={220} height={198} className="h-32 w-auto max-w-[220px] object-contain object-center" /><p className="mt-3 max-w-sm text-sm leading-6 text-white/45">Delivery de bebidas com compra rápida pelo WhatsApp ou pela 99.</p><p className="mt-3 text-[11px] font-bold uppercase tracking-wider text-white/30">Venda proibida para menores de 18 anos.</p></div>
+          <div><div className="text-sm font-black uppercase">Atendimento</div><div className="mt-3 space-y-1 text-sm leading-6 text-white/45">{settings.hours.split("•").map((line) => <p key={line.trim()}>{line.trim()}</p>)}<p className="pt-2">{settings.address}</p></div></div>
           <div className="flex items-start gap-3 md:justify-end"><a href={settings.instagram} target="_blank" rel="noreferrer" className="grid h-11 w-11 place-items-center rounded-full border border-white/10 hover:bg-white/5"><Instagram size={19}/></a><button onClick={() => window.open("https://wa.me/" + (settings.whatsapp || "").replace(/\D/g, ""), "_blank")} className="grid h-11 w-11 place-items-center rounded-full border border-white/10 hover:bg-white/5"><MessageCircle size={19}/></button></div>
         </div>
       </footer>
@@ -232,7 +232,7 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
           <div className="flex items-center justify-between border-b border-white/10 p-5"><div><div className="text-xs font-black uppercase tracking-[.16em] text-[#d0102f]">Seu pedido</div><h2 className="mt-1 text-2xl font-black">Carrinho</h2></div><button onClick={() => setCartOpen(false)} className="grid h-10 w-10 place-items-center rounded-full bg-white/5"><X size={20}/></button></div>
           <div className="flex-1 space-y-3 overflow-y-auto p-5">
             {!cart.length && <div className="grid h-full place-items-center text-center"><div><ShoppingCart className="mx-auto text-white/20" size={48}/><p className="mt-4 font-bold text-white/60">Seu carrinho está vazio.</p><button onClick={() => { setCartOpen(false); scrollToCatalog(); }} className="mt-4 text-sm font-black text-[#e51a3a]">Escolher bebidas</button></div></div>}
-            {cart.map((line) => <div key={line.product.id} className="card flex gap-3 rounded-2xl p-3"><img src={line.product.image} alt="" className="h-20 w-20 rounded-xl object-cover"/><div className="min-w-0 flex-1"><div className="truncate text-sm font-black">{line.product.name}</div><div className="mt-1 text-sm font-black text-[#e51a3a]">{money(line.product.promoPrice ?? line.product.price)}</div><div className="mt-3 inline-flex items-center gap-3 rounded-full bg-white/5 p-1"><button onClick={() => change(line.product.id, -1)} className="grid h-7 w-7 place-items-center rounded-full bg-white/5"><Minus size={13}/></button><span className="w-4 text-center text-xs font-black">{line.qty}</span><button onClick={() => change(line.product.id, 1)} className="grid h-7 w-7 place-items-center rounded-full bg-[#d0102f]"><Plus size={13}/></button></div></div></div>)}
+            {cart.map((line) => <div key={line.product.id} className="card flex gap-3 rounded-2xl p-3"><img src={line.product.image} alt={line.product.name} className="h-20 w-20 rounded-xl bg-white p-1 object-contain object-center" onError={(e) => { e.currentTarget.src = "/carneiro-drinks-logo-v2.svg"; }} /><div className="min-w-0 flex-1"><div className="truncate text-sm font-black">{line.product.name}</div><div className="mt-1 text-sm font-black text-[#e51a3a]">{money(line.product.promoPrice ?? line.product.price)}</div><div className="mt-3 inline-flex items-center gap-3 rounded-full bg-white/5 p-1"><button onClick={() => change(line.product.id, -1)} className="grid h-7 w-7 place-items-center rounded-full bg-white/5"><Minus size={13}/></button><span className="w-4 text-center text-xs font-black">{line.qty}</span><button onClick={() => change(line.product.id, 1)} className="grid h-7 w-7 place-items-center rounded-full bg-[#d0102f]"><Plus size={13}/></button></div></div></div>)}
           </div>
           <div className="border-t border-white/10 p-5">
             <div className="mb-4 flex items-center justify-between"><span className="text-sm text-white/55">Total</span><strong className="text-2xl">{money(total)}</strong></div>
