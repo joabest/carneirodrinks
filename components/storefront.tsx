@@ -32,7 +32,11 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
   const [query, setQuery] = useState("");
   const [cartOpen, setCartOpen] = useState(false);
 
-  const categories = useMemo(() => {\n    const preferred = ["Cervejas", "Whisky", "Vodka", "Gin", "Destilados", "Energéticos", "Refrigerantes", "Sucos", "Água", "Gelo", "Drinks", "Combos", "Promoções"];\n    const fromProducts = Array.from(new Set(initialProducts.map((p) => p.category)));\n    return ["Todos", ...preferred, ...fromProducts.filter((item) => !preferred.includes(item))];\n  }, [initialProducts]);
+  const categories = useMemo(() => {
+    const preferred = ["Cervejas", "Whisky", "Vodka", "Gin", "Destilados", "Energéticos", "Refrigerantes", "Sucos", "Água", "Gelo", "Drinks", "Combos", "Promoções"];
+    const fromProducts = Array.from(new Set(initialProducts.map((p) => p.category)));
+    return ["Todos", ...preferred, ...fromProducts.filter((item) => !preferred.includes(item))];
+  }, [initialProducts]);
   const filtered = useMemo(() => initialProducts.filter((p) => {
     const cat = category === "Todos" || p.category === category;
     const q = !query || (p.name + " " + p.description + " " + p.category).toLowerCase().includes(query.toLowerCase());
