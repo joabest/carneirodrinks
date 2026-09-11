@@ -2,28 +2,45 @@
 
 import { useMemo, useState } from "react";
 import {
-  Beer, ShoppingCart, Search, MapPin, Clock3, Instagram, MessageCircle,
-  Plus, Minus, X, Flame, Sparkles, Truck, ShieldCheck, Home, Heart,
-  PackageCheck, ChevronRight, Wine, GlassWater, Snowflake, Zap
+  Bike, ChevronDown, ChevronRight, Clock3, Heart, Home, Instagram, MapPin,
+  Menu, MessageCircle, Minus, PackageCheck, Plus, Search, ShieldCheck,
+  ShoppingCart, Tag, Truck, UserRound, X, Zap
 } from "lucide-react";
+import BrandLogo from "@/components/brand-logo";
 import type { StoreProduct, StoreSettings } from "@/lib/demo";
 
 type CartLine = { product: StoreProduct; qty: number };
 
-const categoryIcons: Record<string, React.ReactNode> = {
-  "Cervejas": <Beer size={24} />,
-  "Whisky": <Wine size={24} />,
-  "Vodka": <GlassWater size={24} />,
-  "Gin": <Wine size={24} />,
-  "Energéticos": <Zap size={24} />,
-  "Refrigerantes": <GlassWater size={24} />,
-  "Gelo": <Snowflake size={24} />,
-  "Combos": <Sparkles size={24} />,
-  "Promoções": <Flame size={24} />,
+const categories = [
+  ["Cervejas", "🍺"], ["Whisky", "🥃"], ["Vodka", "🍾"], ["Gin", "🍸"],
+  ["Destilados", "🥃"], ["Energéticos", "⚡"], ["Refrigerantes", "🥤"],
+  ["Sucos", "🧃"], ["Água", "💧"], ["Gelo", "🧊"], ["Drinks", "🍸"],
+  ["Combos", "🎁"], ["Promoções", "🏷️"]
+] as const;
+
+const fallbackEmoji: Record<string, string> = {
+  Cervejas: "🍺", Whisky: "🥃", Vodka: "🍾", Gin: "🍸", Destilados: "🥃",
+  Energéticos: "⚡", Refrigerantes: "🥤", Sucos: "🧃", Água: "💧",
+  Gelo: "🧊", Drinks: "🍸", Combos: "🎁", Promoções: "🏷️"
 };
 
 function money(value: number) {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+}
+
+function ProductImage({ product, className = "" }: { product: StoreProduct; className?: string }) {
+  return (
+    <div className={"relative grid place-items-center overflow-hidden bg-white " + className}>
+      <span className="absolute text-6xl opacity-20">{fallbackEmoji[product.category] || "🥤"}</span>
+      <img
+        src={product.image}
+        alt={product.name}
+        loading="lazy"
+        className="relative z-10 h-full w-full object-contain object-center p-3"
+        onError={(e) => { e.currentTarget.style.display = "none"; }}
+      />
+    </div>
+  );
 }
 
 export default function Storefront({ initialProducts, settings }: { initialProducts: StoreProduct[]; settings: StoreSettings }) {
@@ -31,19 +48,18 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
   const [category, setCategory] = useState("Todos");
   const [query, setQuery] = useState("");
   const [cartOpen, setCartOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const categories = useMemo(() => {
-    const preferred = ["Cervejas", "Whisky", "Vodka", "Gin", "Destilados", "Energéticos", "Refrigerantes", "Sucos", "Água", "Gelo", "Drinks", "Combos", "Promoções"];
-    const fromProducts = Array.from(new Set(initialProducts.map((p) => p.category)));
-    return ["Todos", ...preferred, ...fromProducts.filter((item) => !preferred.includes(item))];
-  }, [initialProducts]);
   const filtered = useMemo(() => initialProducts.filter((p) => {
-    const cat = category === "Todos" || p.category === category;
+    const cat = category === "Todos" || category === "Promoções"
+      ? category === "Todos" || Boolean(p.promoPrice)
+      : p.category === category;
     const q = !query || (p.name + " " + p.description + " " + p.category).toLowerCase().includes(query.toLowerCase());
     return cat && q;
   }), [initialProducts, category, query]);
-  const featured = initialProducts.filter((p) => p.featured).slice(0, 4);
-  const combos = initialProducts.filter((p) => p.combo || p.category === "Combos").slice(0, 3);
+
+  const popular = initialProducts.filter((p) => !p.combo).slice(0, 7);
+  const combo = initialProducts.find((p) => p.combo) || initialProducts[0];
   const cartCount = cart.reduce((n, line) => n + line.qty, 0);
   const total = cart.reduce((sum, line) => sum + (line.product.promoPrice ?? line.product.price) * line.qty, 0);
 
@@ -57,7 +73,9 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
   }
 
   function change(id: string, delta: number) {
-    setCart((current) => current.map((line) => line.product.id === id ? { ...line, qty: line.qty + delta } : line).filter((line) => line.qty > 0));
+    setCart((current) => current
+      .map((line) => line.product.id === id ? { ...line, qty: line.qty + delta } : line)
+      .filter((line) => line.qty > 0));
   }
 
   function whatsappCheckout() {
@@ -68,84 +86,142 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
     window.open("https://wa.me/" + phone + "?text=" + encodeURIComponent(message), "_blank", "noopener,noreferrer");
   }
 
-  function scrollToCatalog() {
+  function goCatalog(cat = "Todos") {
+    setCategory(cat);
     document.getElementById("catalogo")?.scrollIntoView({ behavior: "smooth" });
   }
 
   return (
-    <main className="min-h-screen pb-20 md:pb-0">
-      <header className="sticky top-0 z-40 border-b border-white/5 bg-[#0a0605]/90 backdrop-blur-xl">
-        <div className="container-site flex h-20 items-center justify-between gap-3">
-          <a href="#" className="flex items-center" aria-label="Carneiro Drinks - início">
-            <img src="/carneiro-drinks-logo-v2.svg" alt="Carneiro Drinks" width={180} height={162} className="h-[68px] w-auto max-w-[150px] object-contain object-center drop-shadow-[0_0_12px_rgba(208,16,47,.24)] md:max-w-[170px]" />
+    <main className="min-h-screen bg-[#050303] pb-20 text-white md:pb-0">
+      <header className="sticky top-0 z-50 border-b border-white/5 bg-black/95 shadow-[0_10px_40px_rgba(0,0,0,.35)] backdrop-blur-xl">
+        <div className="mx-auto flex h-[82px] max-w-[1320px] items-center gap-5 px-4 lg:px-6">
+          <button onClick={() => setMenuOpen(true)} className="grid h-10 w-10 place-items-center lg:hidden" aria-label="Abrir menu"><Menu /></button>
+          <a href="#" className="shrink-0">
+            <BrandLogo className="block h-[72px] w-[112px] [&>svg]:h-full [&>svg]:w-full" />
           </a>
-          <div className="hidden items-center gap-2 text-xs text-white/70 md:flex"><MapPin size={16} className="text-[#d0102f]" /> {settings.delivery_region}</div>
-          <nav className="hidden items-center gap-6 text-sm font-bold md:flex">
-            <a href="#catalogo" className="hover:text-[#e01538]">Bebidas</a>
-            <a href="#promocoes" className="hover:text-[#e01538]">Promoções</a>
-            <a href="#entrega" className="hover:text-[#e01538]">Entrega</a>
+
+          <nav className="hidden flex-1 items-center justify-center gap-7 text-[13px] font-semibold lg:flex">
+            <a href="#" className="rounded-full bg-[#ff1838] px-5 py-2.5">Início</a>
+            <button onClick={() => goCatalog("Cervejas")} className="flex items-center gap-1 hover:text-[#ff334f]">Bebidas <ChevronDown size={14}/></button>
+            <button onClick={() => goCatalog("Combos")} className="flex items-center gap-1 hover:text-[#ff334f]">Combos <ChevronDown size={14}/></button>
+            <a href="#promocoes" className="hover:text-[#ff334f]">Promoções</a>
+            <a href="#sobre" className="hover:text-[#ff334f]">Sobre</a>
+            <a href="#contato" className="hover:text-[#ff334f]">Contato</a>
           </nav>
-          <button onClick={() => setCartOpen(true)} className="relative grid h-11 w-11 place-items-center rounded-full bg-[#d0102f] transition hover:scale-105" aria-label="Abrir carrinho">
-            <ShoppingCart size={20}/>
-            {cartCount > 0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-white px-1 text-[10px] font-black text-black">{cartCount}</span>}
+
+          <label className="hidden h-11 w-[205px] items-center gap-2 rounded-full border border-white/20 bg-white/[.03] px-4 xl:flex">
+            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar bebidas..." className="min-w-0 flex-1 bg-transparent text-xs outline-none placeholder:text-white/35" />
+            <Search size={18}/>
+          </label>
+
+          <button onClick={() => setCartOpen(true)} className="relative ml-auto grid h-11 w-11 place-items-center rounded-full lg:ml-0" aria-label="Carrinho">
+            <ShoppingCart />
+            {cartCount > 0 && <span className="absolute -right-1 top-0 grid h-5 min-w-5 place-items-center rounded-full bg-[#ff1838] px-1 text-[10px] font-black">{cartCount}</span>}
           </button>
+          <button onClick={() => goCatalog()} className="hidden rounded-xl bg-[#ff1838] px-6 py-3 text-sm font-black lg:block">Fazer Pedido</button>
         </div>
       </header>
 
-      <section className="relative overflow-hidden border-b border-white/5">
-        <div className="absolute inset-0">
-          <img src={settings.hero_image} alt="Bebidas geladas Carneiro Drinks" className="h-full w-full object-cover object-[65%_center] opacity-55" onError={(e) => { e.currentTarget.src = "/carneiro-drinks-logo-v2.svg"; e.currentTarget.className = "h-full w-full object-contain p-16 opacity-30"; }} />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,#0a0605_5%,rgba(10,6,5,.92)_42%,rgba(10,6,5,.35)_100%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_25%,rgba(208,16,47,.25),transparent_30%)]" />
-        </div>
-        <div className="container-site relative z-10 flex min-h-[560px] items-center py-20 md:min-h-[650px]">
-          <div className="max-w-2xl">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#d0102f]/35 bg-[#d0102f]/10 px-4 py-2 text-xs font-black uppercase tracking-[.18em] text-[#ff4a66]"><Flame size={15}/> Delivery de bebidas</div>
-            <h1 className="max-w-xl text-5xl font-black uppercase leading-[.9] tracking-[-.05em] sm:text-6xl md:text-7xl">{settings.hero_title.split(".")[0]}<span className="text-[#d0102f]">.</span></h1>
-            <p className="mt-6 max-w-xl text-base leading-7 text-white/68 md:text-lg">{settings.hero_subtitle}</p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <button onClick={scrollToCatalog} className="red-gradient flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-black uppercase shadow-glow transition hover:-translate-y-0.5">Fazer pedido <ChevronRight size={18}/></button>
-              <a href={settings.link99} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-black uppercase transition hover:bg-white/10">Pedir pela 99</a>
-            </div>
-            <div className="mt-10 grid max-w-xl grid-cols-3 gap-3">
-              <div className="rounded-2xl border border-white/10 bg-black/25 p-4"><div className="text-xl font-black text-[#ff3b59]">Rápido</div><div className="mt-1 text-xs text-white/50">pedido em poucos toques</div></div>
-              <div className="rounded-2xl border border-white/10 bg-black/25 p-4"><div className="text-xl font-black text-[#ff3b59]">Gelado</div><div className="mt-1 text-xs text-white/50">bebida pronta pro rolê</div></div>
-              <div className="rounded-2xl border border-white/10 bg-black/25 p-4"><div className="text-xl font-black text-[#ff3b59]">2 opções</div><div className="mt-1 text-xs text-white/50">WhatsApp ou 99</div></div>
+      <section className="relative isolate overflow-hidden bg-[#130303]">
+        <img src={settings.hero_image} alt="Bebidas geladas no gelo" className="absolute inset-0 h-full w-full object-cover object-center opacity-70 [filter:saturate(1.15)_contrast(1.12)_brightness(.75)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,#0a0303_0%,rgba(10,3,3,.93)_34%,rgba(10,3,3,.25)_67%,rgba(0,0,0,.28)_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_40%,rgba(255,0,30,.13),transparent_32%)]" />
+        <div className="relative mx-auto flex min-h-[480px] max-w-[1320px] items-center px-4 py-14 lg:min-h-[505px] lg:px-8">
+          <div className="max-w-[610px] pt-4">
+            <h1 className="text-[43px] font-black leading-[.98] tracking-[-.035em] sm:text-5xl lg:text-[58px]">
+              Bebidas geladas,<br/><span className="text-[#ff1838]">onde você estiver!</span>
+            </h1>
+            <p className="mt-5 max-w-xl text-base leading-7 text-white/82 lg:text-lg">{settings.hero_subtitle}</p>
+            <button onClick={() => goCatalog()} className="mt-7 flex items-center gap-3 rounded-xl bg-[#ff1838] px-7 py-4 text-base font-black shadow-[0_12px_32px_rgba(255,24,56,.2)]">
+              <Bike size={24}/> Fazer Pedido Agora <ChevronRight size={20}/>
+            </button>
+            <div className="mt-8 hidden flex-wrap gap-x-7 gap-y-3 text-xs text-white/75 sm:flex">
+              <span className="flex items-center gap-2"><Bike size={17}/>Entrega rápida</span>
+              <span className="flex items-center gap-2"><ShieldCheck size={17}/>Bebidas originais</span>
+              <span className="flex items-center gap-2"><Tag size={17}/>Melhores preços</span>
+              <span className="flex items-center gap-2"><Zap size={17}/>Qualidade garantida</span>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="relative z-20 -mt-9">
-        <div className="container-site">
-          <div className="glass hide-scrollbar flex gap-2 overflow-x-auto rounded-[28px] p-3 shadow-2xl">
-            {categories.map((item) => (
-              <button key={item} onClick={() => { setCategory(item); document.getElementById("catalogo")?.scrollIntoView({ behavior: "smooth" }); }} className={(category === item ? "bg-[#d0102f] text-white shadow-glow " : "bg-white/[.04] text-white/70 hover:bg-white/[.08] ") + "min-w-[92px] rounded-2xl px-4 py-3 text-center transition"}>
-                <span className="mx-auto mb-2 grid h-8 place-items-center">{item === "Todos" ? <Sparkles size={24}/> : categoryIcons[item] || <GlassWater size={24}/>}</span>
-                <span className="text-xs font-black">{item}</span>
+      <section className="relative z-20 -mt-5 px-3 sm:px-4">
+        <div className="mx-auto max-w-[1280px] overflow-x-auto rounded-2xl bg-white p-2.5 text-black shadow-[0_14px_45px_rgba(0,0,0,.45)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex min-w-max items-stretch">
+            {categories.map(([name, icon]) => (
+              <button key={name} onClick={() => goCatalog(name)} className={"group min-w-[82px] rounded-xl px-3 py-2.5 text-center transition sm:min-w-[92px] " + (category === name ? "bg-[#fff0f2] text-[#ff1838]" : "hover:bg-[#f7f7f7]")}>
+                <span className="block text-2xl">{icon}</span>
+                <span className={"mt-1 block text-[11px] font-semibold " + (category === name ? "border-b-2 border-[#ff1838] pb-1" : "")}>{name}</span>
               </button>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="promocoes" className="container-site py-14">
-        <div className="mb-6 flex items-end justify-between gap-4">
-          <div><div className="text-xs font-black uppercase tracking-[.2em] text-[#d0102f]">Destaques</div><h2 className="mt-2 text-3xl font-black uppercase tracking-tight">Mais pedidos <span className="text-[#d0102f]">hoje</span></h2></div>
-          <button onClick={scrollToCatalog} className="text-sm font-bold text-white/60 hover:text-white">Ver todos</button>
+      <section id="promocoes" className="mx-auto max-w-[1320px] px-4 pb-3 pt-5 lg:px-6">
+        <div className="mb-2 flex items-center justify-between">
+          <div>
+            <h2 className="flex items-center gap-2 text-xl font-black"><Zap className="fill-[#ff1838] text-[#ff1838]"/> Promoções em Destaque</h2>
+            <p className="ml-8 text-xs text-white/50">Aproveite nossas ofertas especiais</p>
+          </div>
+          <button onClick={() => goCatalog("Promoções")} className="rounded-full border border-[#ff1838] px-4 py-2 text-xs">Ver todas <ChevronRight size={13} className="inline"/></button>
         </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {featured.map((product, index) => (
-            <article key={product.id} className={(index === 0 ? "md:col-span-2 " : "") + "card group relative min-h-[310px] overflow-hidden rounded-[26px]"}>
-              <img src={product.image} alt={product.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover object-center opacity-55 transition duration-500 group-hover:scale-105" onError={(e) => { e.currentTarget.src = "/carneiro-drinks-logo-v2.svg"; e.currentTarget.className = "absolute inset-0 h-full w-full object-contain p-10 opacity-35"; }} />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0605] via-[#0a0605]/55 to-transparent" />
-              {product.promoPrice && <span className="absolute left-4 top-4 rounded-full bg-[#d0102f] px-3 py-1 text-[11px] font-black uppercase">Oferta</span>}
-              <div className="absolute inset-x-0 bottom-0 p-5">
-                <div className="text-xs font-bold uppercase text-[#ff516b]">{product.category}</div>
-                <h3 className="mt-1 text-xl font-black">{product.name}</h3>
-                <div className="mt-3 flex items-end justify-between gap-4">
-                  <div>{product.promoPrice && <div className="text-xs text-white/40 line-through">{money(product.price)}</div>}<div className="text-xl font-black text-white">{money(product.promoPrice ?? product.price)}</div></div>
-                  <button onClick={() => add(product)} className="grid h-11 w-11 place-items-center rounded-full bg-[#d0102f] transition hover:scale-110"><Plus size={21}/></button>
+
+        <div className="grid gap-3 lg:grid-cols-3">
+          <article className="relative min-h-[190px] overflow-hidden rounded-xl border border-white/10 bg-[#1a0808] p-5">
+            {combo && <ProductImage product={combo} className="absolute right-0 top-0 h-full w-[48%] bg-transparent [&>span]:hidden [&>img]:p-0" />}
+            <div className="relative z-10 max-w-[55%]">
+              <h3 className="text-2xl font-black uppercase leading-[.95]">Combo do<br/><span className="text-[#ff1838]">fim de semana</span></h3>
+              <p className="mt-3 text-xs leading-5 text-white/80">1 Whisky Red Label<br/>+ 4 Energéticos<br/>+ Gelo Grátis</p>
+              <div className="mt-4 flex items-end gap-3">
+                <button onClick={() => combo && add(combo)} className="rounded-full bg-[#ff1838] px-5 py-2 text-xs font-bold">Aproveitar</button>
+                <div><span className="block text-[10px] text-white/45 line-through">De R$ 169,90</span><strong className="text-xl text-[#ff1838]">R$ 149,90</strong></div>
+              </div>
+            </div>
+          </article>
+
+          <article className="relative min-h-[190px] overflow-hidden rounded-xl border border-white/10 bg-[#071409] p-5">
+            <img src="https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=900&q=85" alt="" className="absolute inset-0 h-full w-full object-cover opacity-60" onError={(e)=>e.currentTarget.style.display="none"} />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#071409] via-[#071409]/90 to-transparent"/>
+            <div className="relative z-10 max-w-[58%]">
+              <h3 className="text-2xl font-black uppercase leading-[.95]">Cervejas<br/><span className="text-[#ff1838]">em promoção</span></h3>
+              <p className="mt-3 text-xs leading-5 text-white/80">Heineken Long Neck<br/>Por apenas:</p>
+              <strong className="mt-1 block text-2xl text-[#ff1838]">R$ 6,99</strong>
+              <button onClick={() => goCatalog("Cervejas")} className="mt-3 rounded-full bg-[#ff1838] px-5 py-2 text-xs font-bold">Ver Ofertas</button>
+            </div>
+          </article>
+
+          <article className="relative min-h-[190px] overflow-hidden rounded-xl border border-white/10 bg-[#240707] p-5">
+            <img src="https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=900&q=85" alt="" className="absolute inset-0 h-full w-full object-cover opacity-70" onError={(e)=>e.currentTarget.style.display="none"} />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#200505] via-[#200505]/88 to-transparent"/>
+            <div className="relative z-10 max-w-[55%]">
+              <h3 className="text-2xl font-black uppercase leading-[.95]">Drinks<br/><span className="text-[#ff1838]">especiais</span></h3>
+              <p className="mt-3 text-xs leading-5 text-white/80">Caipirinhas, Gin Tônica<br/>e muito mais!</p>
+              <button onClick={() => goCatalog("Drinks")} className="mt-4 rounded-full bg-[#ff1838] px-5 py-2 text-xs font-bold">Ver Cardápio</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="catalogo" className="mx-auto max-w-[1320px] px-4 pb-5 pt-2 lg:px-6">
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <h2 className="flex items-center gap-2 text-xl font-black"><span className="text-2xl">🔥</span> Mais Pedidos</h2>
+            <p className="ml-8 text-xs text-white/50">Os favoritos dos nossos clientes</p>
+          </div>
+          <button onClick={() => goCatalog()} className="rounded-full border border-[#ff1838] px-4 py-2 text-xs">Ver todos <ChevronRight size={13} className="inline"/></button>
+        </div>
+
+        <div className="flex gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {(query || category !== "Todos" ? filtered : popular).map((product) => (
+            <article key={product.id} className="min-w-[155px] max-w-[155px] overflow-hidden rounded-lg bg-white text-black sm:min-w-[175px] sm:max-w-[175px]">
+              <ProductImage product={product} className="h-[145px] w-full" />
+              <div className="p-3">
+                <h3 className="min-h-[34px] text-[12px] font-black leading-4">{product.name}</h3>
+                <p className="mt-1 text-[11px] text-black/50">{product.description}</p>
+                <div className="mt-3 flex items-end justify-between gap-2">
+                  <strong className="text-[15px]">{money(product.promoPrice ?? product.price)}</strong>
+                  <button onClick={() => add(product)} className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#ff1838] text-white"><Plus size={20}/></button>
                 </div>
               </div>
             </article>
@@ -153,92 +229,71 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
         </div>
       </section>
 
-      {combos.length > 0 && <section className="container-site pb-8">
-        <div className="red-gradient relative overflow-hidden rounded-[30px] p-7 shadow-glow md:p-10">
-          <div className="absolute -right-12 -top-12 h-60 w-60 rounded-full bg-black/20 blur-2xl" />
-          <div className="relative z-10 grid gap-7 lg:grid-cols-[.8fr_1.2fr] lg:items-center">
-            <div><div className="text-xs font-black uppercase tracking-[.2em] text-white/70">Combos do rolê</div><h2 className="mt-2 text-3xl font-black uppercase md:text-4xl">Mais bebida. <br/>Menos complicação.</h2><p className="mt-3 max-w-md text-sm leading-6 text-white/75">Combos prontos para festa, encontro ou madrugada. Adicione ao carrinho e escolha como quer pedir.</p></div>
-            <div className="grid gap-3 sm:grid-cols-3">{combos.map((p) => <button key={p.id} onClick={() => add(p)} className="rounded-2xl border border-white/15 bg-black/20 p-4 text-left backdrop-blur transition hover:bg-black/30"><div className="line-clamp-2 text-sm font-black">{p.name}</div><div className="mt-2 text-lg font-black">{money(p.promoPrice ?? p.price)}</div><div className="mt-3 inline-flex items-center gap-1 text-xs font-bold">Adicionar <Plus size={14}/></div></button>)}</div>
+      <footer id="contato" className="border-t border-white/10 bg-black">
+        <div className="mx-auto grid max-w-[1320px] gap-7 px-5 py-7 md:grid-cols-[1.15fr_1fr_1fr_.8fr]">
+          <div id="sobre">
+            <BrandLogo className="block h-[92px] w-[145px] [&>svg]:h-full [&>svg]:w-full" />
+            <p className="mt-2 max-w-[270px] text-xs leading-5 text-white/65">Qualidade, variedade e entrega rápida.<br/>Bebidas para todos os momentos.</p>
+          </div>
+          <div>
+            <h3 className="flex items-center gap-2 text-sm font-bold"><Clock3 size={18}/> Horário de Funcionamento</h3>
+            <div className="mt-2 space-y-0.5 text-[11px] leading-4 text-white/65">
+              {settings.hours.split("•").map((line) => <p key={line.trim()} className={line.includes("Terça") ? "text-[#ff1838]" : ""}>{line.trim()}</p>)}
+            </div>
+          </div>
+          <div>
+            <h3 className="flex items-center gap-2 text-sm font-bold"><Truck size={18}/> Região de Entrega</h3>
+            <p className="mt-2 text-xs leading-5 text-white/65">{settings.delivery_region}</p>
+            <h3 className="mt-4 flex items-center gap-2 text-sm font-bold"><MapPin size={18}/> Endereço</h3>
+            <p className="mt-2 text-xs leading-5 text-white/65">{settings.address}</p>
+          </div>
+          <div>
+            <h3 className="text-sm font-bold">Redes Sociais</h3>
+            <div className="mt-3 flex gap-3">
+              <a href={settings.instagram} target="_blank" rel="noreferrer" className="grid h-10 w-10 place-items-center rounded-lg border border-[#ff1838] text-[#ff1838]"><Instagram size={22}/></a>
+              <a href={"https://wa.me/" + (settings.whatsapp || "").replace(/\D/g, "")} target="_blank" rel="noreferrer" className="grid h-10 w-10 place-items-center rounded-lg border border-white/30"><MessageCircle size={22}/></a>
+            </div>
           </div>
         </div>
-      </section>}
-
-      <section id="catalogo" className="container-site py-12">
-        <div className="mb-7 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div><div className="text-xs font-black uppercase tracking-[.2em] text-[#d0102f]">Catálogo</div><h2 className="mt-2 text-3xl font-black uppercase">Escolha suas <span className="text-[#d0102f]">bebidas</span></h2></div>
-          <label className="glass flex h-12 items-center gap-2 rounded-full px-4 md:w-[360px]"><Search size={18} className="text-white/45"/><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar bebida, combo..." className="w-full bg-transparent text-sm outline-none placeholder:text-white/35"/></label>
-        </div>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-          {filtered.map((product) => (
-            <article key={product.id} className="overflow-hidden rounded-2xl border border-black/5 bg-white text-[#111] shadow-[0_8px_30px_rgba(0,0,0,.18)]">
-              <div className="relative aspect-[1/1] overflow-hidden bg-white p-3">
-                <img src={product.image} alt={product.name} loading="lazy" className="h-full w-full object-contain object-center transition duration-500 hover:scale-[1.03]" onError={(e) => { e.currentTarget.src = "/carneiro-drinks-logo-v2.svg"; e.currentTarget.className = "h-full w-full object-contain object-center p-8"; }} />
-                {!product.available && <div className="absolute inset-0 grid place-items-center bg-black/70"><span className="rounded-full bg-white/10 px-3 py-1 text-xs font-black">Indisponível</span></div>}
-                {product.promoPrice && <span className="absolute left-2 top-2 rounded-full bg-[#d0102f] px-2.5 py-1 text-[10px] font-black uppercase">Promo</span>}
-              </div>
-              <div className="p-3.5 md:p-4">
-                <div className="text-[10px] font-black uppercase tracking-wider text-[#d0102f]">{product.category}</div>
-                <h3 className="mt-1 min-h-10 text-sm font-black leading-5 text-[#111] md:text-base">{product.name}</h3>
-                <p className="mt-1 line-clamp-2 min-h-8 text-[11px] leading-4 text-black/50">{product.description}</p>
-                <div className="mt-4 flex items-end justify-between gap-2">
-                  <div>{product.promoPrice && <div className="text-[10px] text-black/35 line-through">{money(product.price)}</div>}<div className="text-base font-black text-[#111] md:text-lg">{money(product.promoPrice ?? product.price)}</div></div>
-                  <button disabled={!product.available} onClick={() => add(product)} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#d0102f] disabled:cursor-not-allowed disabled:opacity-30"><Plus size={18}/></button>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-        {!filtered.length && <div className="card mt-4 rounded-2xl p-10 text-center text-white/50">Nenhum produto encontrado nesta categoria.</div>}
-      </section>
-
-      <section id="entrega" className="container-site pb-14 pt-4">
-        <div className="grid gap-4 md:grid-cols-3">
-          <div className="card rounded-3xl p-6"><Clock3 className="text-[#d0102f]"/><h3 className="mt-5 font-black uppercase">Horário</h3><div className="mt-2 space-y-1 text-sm leading-6 text-white/55">{settings.hours.split("•").map((line) => <p key={line.trim()}>{line.trim()}</p>)}</div></div>
-          <div className="card rounded-3xl p-6"><Truck className="text-[#d0102f]"/><h3 className="mt-5 font-black uppercase">Entrega</h3><p className="mt-2 text-sm leading-6 text-white/55">{settings.delivery_region}<br/>Pedido mínimo: {settings.min_order}</p></div>
-          <div className="card rounded-3xl p-6"><MapPin className="text-[#d0102f]"/><h3 className="mt-5 font-black uppercase">Endereço</h3><p className="mt-2 text-sm leading-6 text-white/55">{settings.address}</p></div>
-        </div>
-      </section>
-
-      <section className="red-gradient py-12">
-        <div className="container-site flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
-          <div><h2 className="text-3xl font-black uppercase">Bateu a sede?</h2><p className="mt-2 text-sm text-white/75">Monte seu carrinho e escolha WhatsApp ou 99 para finalizar.</p></div>
-          <button onClick={scrollToCatalog} className="rounded-full bg-black px-7 py-4 text-sm font-black uppercase transition hover:scale-105">Fazer meu pedido</button>
-        </div>
-      </section>
-
-      <footer className="border-t border-white/5 bg-[#070404] py-10">
-        <div className="container-site grid gap-8 md:grid-cols-3">
-          <div><img src="/carneiro-drinks-logo-v2.svg" alt="Carneiro Drinks" width={220} height={198} className="h-32 w-auto max-w-[220px] object-contain object-center" /><p className="mt-3 max-w-sm text-sm leading-6 text-white/45">Delivery de bebidas com compra rápida pelo WhatsApp ou pela 99.</p><p className="mt-3 text-[11px] font-bold uppercase tracking-wider text-white/30">Venda proibida para menores de 18 anos.</p></div>
-          <div><div className="text-sm font-black uppercase">Atendimento</div><div className="mt-3 space-y-1 text-sm leading-6 text-white/45">{settings.hours.split("•").map((line) => <p key={line.trim()}>{line.trim()}</p>)}<p className="pt-2">{settings.address}</p></div></div>
-          <div className="flex items-start gap-3 md:justify-end"><a href={settings.instagram} target="_blank" rel="noreferrer" className="grid h-11 w-11 place-items-center rounded-full border border-white/10 hover:bg-white/5"><Instagram size={19}/></a><button onClick={() => window.open("https://wa.me/" + (settings.whatsapp || "").replace(/\D/g, ""), "_blank")} className="grid h-11 w-11 place-items-center rounded-full border border-white/10 hover:bg-white/5"><MessageCircle size={19}/></button></div>
+        <div className="mx-auto flex max-w-[1320px] flex-col gap-3 border-t border-white/10 px-5 py-4 text-[10px] text-white/45 sm:flex-row sm:items-center sm:justify-between">
+          <span>© 2026 Carneiro Drinks. Todos os direitos reservados.</span>
+          <span className="flex items-center gap-3 uppercase">Proibida a venda para menores de 18 anos <b className="grid h-10 w-10 place-items-center rounded-full border-2 border-[#ff1838] text-sm text-white">18+</b></span>
         </div>
       </footer>
 
-      <button onClick={() => window.open("https://wa.me/" + (settings.whatsapp || "").replace(/\D/g, ""), "_blank")} className="pulse-soft fixed bottom-24 right-4 z-30 grid h-14 w-14 place-items-center rounded-full bg-[#d0102f] shadow-2xl md:bottom-6 md:right-6" aria-label="WhatsApp"><MessageCircle/></button>
+      <button onClick={() => window.open("https://wa.me/" + (settings.whatsapp || "").replace(/\D/g, ""), "_blank")} className="fixed bottom-24 right-4 z-40 grid h-14 w-14 place-items-center rounded-full bg-[#ff1838] shadow-[0_10px_30px_rgba(255,24,56,.35)] md:bottom-6" aria-label="WhatsApp"><MessageCircle/></button>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#0b0707]/95 px-4 py-2 backdrop-blur-xl md:hidden">
-        <div className="mx-auto flex max-w-md items-center justify-between">
-          <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="flex w-16 flex-col items-center gap-1 text-[10px] font-bold text-[#ff3d5b]"><Home size={19}/>Início</button>
-          <button onClick={scrollToCatalog} className="flex w-16 flex-col items-center gap-1 text-[10px] font-bold text-white/55"><PackageCheck size={19}/>Produtos</button>
-          <button onClick={() => setCartOpen(true)} className="relative -mt-7 grid h-14 w-14 place-items-center rounded-full bg-[#d0102f] shadow-glow"><ShoppingCart size={23}/>{cartCount > 0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-white px-1 text-[10px] font-black text-black">{cartCount}</span>}</button>
-          <a href={settings.instagram} target="_blank" rel="noreferrer" className="flex w-16 flex-col items-center gap-1 text-[10px] font-bold text-white/55"><Heart size={19}/>Social</a>
-          <button onClick={() => window.open(settings.link99, "_blank")} className="flex w-16 flex-col items-center gap-1 text-[10px] font-bold text-white/55"><ShieldCheck size={19}/>99</button>
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-black/95 px-4 py-2 backdrop-blur md:hidden">
+        <div className="mx-auto flex max-w-md items-end justify-between">
+          <button onClick={() => window.scrollTo({top:0,behavior:"smooth"})} className="flex w-14 flex-col items-center gap-1 text-[9px] text-[#ff1838]"><Home size={20}/>Início</button>
+          <button onClick={() => goCatalog()} className="flex w-14 flex-col items-center gap-1 text-[9px] text-white/65"><PackageCheck size={20}/>Categorias</button>
+          <button onClick={() => goCatalog()} className="-mt-5 flex h-14 w-14 flex-col items-center justify-center rounded-full bg-[#ff1838] text-[8px] font-bold"><Bike size={23}/></button>
+          <button onClick={() => goCatalog("Promoções")} className="flex w-14 flex-col items-center gap-1 text-[9px] text-white/65"><Tag size={20}/>Promoções</button>
+          <button className="flex w-14 flex-col items-center gap-1 text-[9px] text-white/65"><UserRound size={20}/>Perfil</button>
         </div>
       </nav>
 
-      {cartOpen && <div className="fixed inset-0 z-50">
-        <button className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setCartOpen(false)} aria-label="Fechar carrinho"/>
-        <aside className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-white/10 bg-[#0e0909] shadow-2xl">
-          <div className="flex items-center justify-between border-b border-white/10 p-5"><div><div className="text-xs font-black uppercase tracking-[.16em] text-[#d0102f]">Seu pedido</div><h2 className="mt-1 text-2xl font-black">Carrinho</h2></div><button onClick={() => setCartOpen(false)} className="grid h-10 w-10 place-items-center rounded-full bg-white/5"><X size={20}/></button></div>
-          <div className="flex-1 space-y-3 overflow-y-auto p-5">
-            {!cart.length && <div className="grid h-full place-items-center text-center"><div><ShoppingCart className="mx-auto text-white/20" size={48}/><p className="mt-4 font-bold text-white/60">Seu carrinho está vazio.</p><button onClick={() => { setCartOpen(false); scrollToCatalog(); }} className="mt-4 text-sm font-black text-[#e51a3a]">Escolher bebidas</button></div></div>}
-            {cart.map((line) => <div key={line.product.id} className="card flex gap-3 rounded-2xl p-3"><img src={line.product.image} alt={line.product.name} className="h-20 w-20 rounded-xl bg-white p-1 object-contain object-center" onError={(e) => { e.currentTarget.src = "/carneiro-drinks-logo-v2.svg"; }} /><div className="min-w-0 flex-1"><div className="truncate text-sm font-black">{line.product.name}</div><div className="mt-1 text-sm font-black text-[#e51a3a]">{money(line.product.promoPrice ?? line.product.price)}</div><div className="mt-3 inline-flex items-center gap-3 rounded-full bg-white/5 p-1"><button onClick={() => change(line.product.id, -1)} className="grid h-7 w-7 place-items-center rounded-full bg-white/5"><Minus size={13}/></button><span className="w-4 text-center text-xs font-black">{line.qty}</span><button onClick={() => change(line.product.id, 1)} className="grid h-7 w-7 place-items-center rounded-full bg-[#d0102f]"><Plus size={13}/></button></div></div></div>)}
+      {menuOpen && <div className="fixed inset-0 z-[70] bg-black/75 backdrop-blur-sm lg:hidden">
+        <aside className="h-full w-[82%] max-w-[330px] bg-[#090505] p-5 shadow-2xl">
+          <div className="flex items-center justify-between"><BrandLogo className="block h-20 w-32 [&>svg]:h-full [&>svg]:w-full"/><button onClick={()=>setMenuOpen(false)}><X/></button></div>
+          <div className="mt-7 space-y-2">
+            {["Todos","Cervejas","Whisky","Vodka","Gin","Energéticos","Refrigerantes","Combos","Promoções"].map((item)=><button key={item} onClick={()=>{goCatalog(item);setMenuOpen(false)}} className="block w-full rounded-xl px-4 py-3 text-left text-sm font-semibold hover:bg-white/5">{item === "Todos" ? "Início / Todos" : item}</button>)}
+          </div>
+        </aside>
+      </div>}
+
+      {cartOpen && <div className="fixed inset-0 z-[80]">
+        <button className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={() => setCartOpen(false)} aria-label="Fechar"/>
+        <aside className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-white/10 bg-[#0a0606]">
+          <div className="flex items-center justify-between border-b border-white/10 p-5"><div><span className="text-xs font-bold uppercase text-[#ff1838]">Seu pedido</span><h2 className="text-2xl font-black">Carrinho</h2></div><button onClick={()=>setCartOpen(false)}><X/></button></div>
+          <div className="flex-1 space-y-3 overflow-y-auto p-4">
+            {!cart.length && <div className="grid h-full place-items-center text-center text-white/50"><div><ShoppingCart className="mx-auto mb-3" size={46}/><p>Seu carrinho está vazio.</p></div></div>}
+            {cart.map((line)=><div key={line.product.id} className="flex gap-3 rounded-xl border border-white/10 bg-white/[.03] p-3"><ProductImage product={line.product} className="h-20 w-20 shrink-0 rounded-lg"/><div className="min-w-0 flex-1"><h3 className="truncate text-sm font-bold">{line.product.name}</h3><p className="mt-1 text-sm font-black text-[#ff1838]">{money(line.product.promoPrice ?? line.product.price)}</p><div className="mt-3 flex w-fit items-center gap-3 rounded-full bg-white/5 p-1"><button onClick={()=>change(line.product.id,-1)} className="grid h-7 w-7 place-items-center rounded-full"><Minus size={14}/></button><span className="text-xs font-bold">{line.qty}</span><button onClick={()=>change(line.product.id,1)} className="grid h-7 w-7 place-items-center rounded-full bg-[#ff1838]"><Plus size={14}/></button></div></div></div>)}
           </div>
           <div className="border-t border-white/10 p-5">
-            <div className="mb-4 flex items-center justify-between"><span className="text-sm text-white/55">Total</span><strong className="text-2xl">{money(total)}</strong></div>
-            <button disabled={!cart.length} onClick={whatsappCheckout} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#d0102f] px-5 py-4 text-sm font-black uppercase disabled:opacity-30"><MessageCircle size={18}/> Finalizar pelo WhatsApp</button>
-            <a href={settings.link99} target="_blank" rel="noreferrer" className="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl border border-white/12 bg-white/5 px-5 py-4 text-sm font-black uppercase">Pedir pela 99</a>
-            <p className="mt-3 text-center text-[10px] leading-4 text-white/35">Na 99, o cliente será direcionado para o link configurado pela loja.</p>
+            <div className="mb-4 flex items-center justify-between"><span className="text-white/55">Total</span><strong className="text-2xl">{money(total)}</strong></div>
+            <button disabled={!cart.length} onClick={whatsappCheckout} className="w-full rounded-xl bg-[#ff1838] py-4 text-sm font-black uppercase disabled:opacity-40">Finalizar pelo WhatsApp</button>
+            <a href={settings.link99} target="_blank" rel="noreferrer" className="mt-2 block w-full rounded-xl border border-white/15 py-4 text-center text-sm font-black uppercase">Pedir pela 99</a>
           </div>
         </aside>
       </div>}
