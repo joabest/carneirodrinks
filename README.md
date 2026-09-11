@@ -62,6 +62,8 @@ npm run dev
 
 ## Vercel
 
+**Site publicado:** https://joabest-carneirodrinks.vercel.app
+
 Importe este repositório na Vercel e cadastre as 3 variáveis de ambiente acima. O comando de build já executa `prisma generate` automaticamente.
 
 Depois de publicar, acesse `/admin` para cadastrar produtos e trocar WhatsApp, link da 99 e informações da loja.
