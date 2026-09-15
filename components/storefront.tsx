@@ -128,11 +128,11 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
 
       <section className="relative isolate min-h-[445px] overflow-hidden bg-[#130303] sm:min-h-[460px] md:min-h-[350px] lg:min-h-[325px]">
         <img
-          src={settings.hero_image}
+          src={settings.hero_image || "/hero-reference.webp"}
           alt="Bebidas geladas em um balde de gelo"
           loading="eager"
           onError={(e) => { e.currentTarget.style.display = "none"; }}
-          className="absolute bottom-0 left-0 h-[235px] w-full object-cover object-[center_30%] opacity-95 [filter:saturate(1.06)_contrast(1.04)_brightness(.92)] sm:h-[255px] md:bottom-auto md:left-auto md:right-0 md:top-0 md:h-full md:w-[61%] md:object-[center_38%]"
+          className="absolute bottom-0 left-0 h-[250px] w-full object-cover object-center opacity-95 [filter:saturate(1.06)_contrast(1.04)_brightness(.92)] sm:h-[270px] md:bottom-auto md:left-auto md:right-0 md:top-0 md:h-full md:w-[61%] md:object-cover md:object-center"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,#070303_0%,#080303_45%,rgba(8,3,3,.35)_66%,rgba(0,0,0,.15)_100%)] md:bg-[linear-gradient(90deg,#050202_0%,#080303_38%,rgba(8,3,3,.78)_51%,rgba(8,3,3,.10)_76%,rgba(0,0,0,.06)_100%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_40%,rgba(255,0,30,.13),transparent_32%)]" />
@@ -178,7 +178,7 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
           </div>
 
           <div className="relative hidden overflow-hidden rounded-2xl bg-white shadow-[0_14px_45px_rgba(0,0,0,.45)] lg:block">
-            <img src="/categories-reference.webp" alt="Categorias de bebidas Carneiro Drinks" className="block h-auto w-full select-none" draggable={false} />
+            <img src={settings.category_strip_image || "/categories-reference.webp"} alt="Categorias de bebidas Carneiro Drinks" className="block h-auto w-full select-none" draggable={false} />
             <div className="absolute inset-0 grid" style={{ gridTemplateColumns: "repeat(13,minmax(0,1fr))" }}>
               {categories.map(([name]) => (
                 <button key={name} onClick={() => goCatalog(name)} aria-label={"Ver " + name} className="h-full w-full bg-transparent" />
@@ -203,7 +203,7 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
 
         <div className="hide-scrollbar -mx-3 flex snap-x snap-mandatory gap-2 overflow-x-auto px-3 pb-1 sm:-mx-4 sm:px-4 lg:mx-0 lg:grid lg:grid-cols-3 lg:gap-3 lg:overflow-visible lg:px-0">
           <article className="relative min-h-[144px] min-w-[88%] snap-start overflow-hidden rounded-xl border border-white/10 bg-[#1a0808] p-4 sm:min-w-[56%] lg:min-w-0">
-            {combo && <ProductImage product={combo} className="absolute right-0 top-0 h-full w-[46%] bg-transparent [&>span]:hidden [&>img]:p-0" />}
+            {settings.promo_combo_image ? <img src={settings.promo_combo_image} alt="" className="absolute right-0 top-0 h-full w-[46%] object-cover" /> : combo && <ProductImage product={combo} className="absolute right-0 top-0 h-full w-[46%] bg-transparent [&>span]:hidden [&>img]:p-0" />}
             <div className="relative z-10 max-w-[58%]">
               <h3 className="text-[17px] font-black uppercase leading-[.95] sm:text-[18px]">Combo do<br/><span className="text-[#ff1838]">fim de semana</span></h3>
               <p className="mt-2 text-[9px] leading-[14px] text-white/80 sm:text-[10px] sm:leading-4">1 Whisky Red Label<br/>+ 4 Energéticos<br/>+ Gelo Grátis</p>
@@ -218,7 +218,7 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
           </article>
 
           <article className="relative min-h-[144px] min-w-[88%] snap-start overflow-hidden rounded-xl border border-white/10 bg-[#071409] p-4 sm:min-w-[56%] lg:min-w-0">
-            <img src="https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=900&q=85" alt="" className="absolute inset-0 h-full w-full object-cover opacity-60" onError={(e)=>e.currentTarget.style.display="none"} />
+            <img src={settings.promo_beer_image || "https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=900&q=85"} alt="" className="absolute inset-0 h-full w-full object-cover opacity-60" onError={(e)=>e.currentTarget.style.display="none"} />
             <div className="absolute inset-0 bg-gradient-to-r from-[#071409] via-[#071409]/90 to-transparent"/>
             <div className="relative z-10 max-w-[60%]">
               <h3 className="text-[17px] font-black uppercase leading-[.95] sm:text-[18px]">Cervejas<br/><span className="text-[#ff1838]">em promoção</span></h3>
@@ -229,7 +229,7 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
           </article>
 
           <article className="relative min-h-[144px] min-w-[88%] snap-start overflow-hidden rounded-xl border border-white/10 bg-[#240707] p-4 sm:min-w-[56%] lg:min-w-0">
-            <img src="https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=900&q=85" alt="" className="absolute inset-0 h-full w-full object-cover opacity-70" onError={(e)=>e.currentTarget.style.display="none"} />
+            <img src={settings.promo_drinks_image || "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=900&q=85"} alt="" className="absolute inset-0 h-full w-full object-cover opacity-70" onError={(e)=>e.currentTarget.style.display="none"} />
             <div className="absolute inset-0 bg-gradient-to-r from-[#200505] via-[#200505]/88 to-transparent"/>
             <div className="relative z-10 max-w-[58%]">
               <h3 className="text-[17px] font-black uppercase leading-[.95] sm:text-[18px]">Drinks<br/><span className="text-[#ff1838]">especiais</span></h3>

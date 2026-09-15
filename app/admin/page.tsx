@@ -35,7 +35,11 @@ const blankProduct: Omit<Product, "id"> = {
 const settingFields = [
   ["hero_title", "Título principal"],
   ["hero_subtitle", "Texto do banner"],
-  ["hero_image", "URL da imagem do banner"],
+  ["hero_image", "Banner principal"],
+  ["category_strip_image", "Faixa com imagens das categorias"],
+  ["promo_combo_image", "Imagem da promoção: combo"],
+  ["promo_beer_image", "Imagem da promoção: cervejas"],
+  ["promo_drinks_image", "Imagem da promoção: drinks"],
   ["whatsapp", "WhatsApp com DDI + DDD"],
   ["link99", "Link oficial da 99"],
   ["instagram", "Link do Instagram"],
@@ -44,6 +48,32 @@ const settingFields = [
   ["delivery_region", "Região de entrega"],
   ["min_order", "Pedido mínimo"],
 ] as const;
+
+const imageSettingKeys = new Set([
+  "hero_image", "category_strip_image", "promo_combo_image",
+  "promo_beer_image", "promo_drinks_image"
+]);
+
+async function fileToOptimizedDataUrl(file: File) {
+  const objectUrl = URL.createObjectURL(file);
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const element = new Image();
+      element.onload = () => resolve(element);
+      element.onerror = reject;
+      element.src = objectUrl;
+    });
+    const limit = 1920;
+    const scale = Math.min(1, limit / Math.max(image.naturalWidth, image.naturalHeight));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(image.naturalWidth * scale);
+    canvas.height = Math.round(image.naturalHeight * scale);
+    canvas.getContext("2d")?.drawImage(image, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/webp", 0.86);
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
 
 export default function AdminPage() {
   const [authorized, setAuthorized] = useState<boolean | null>(null);
@@ -138,6 +168,34 @@ export default function AdminPage() {
     setMessage(response.ok ? "Configurações salvas." : "Erro ao salvar configurações.");
   }
 
+  async function selectSettingImage(key: string, file?: File) {
+    if (!file) return;
+    setLoading(true);
+    setMessage("Preparando imagem...");
+    try {
+      const value = await fileToOptimizedDataUrl(file);
+      setSettings((current) => ({ ...current, [key]: value }));
+      setMessage("Imagem pronta. Clique em Salvar configurações.");
+    } catch {
+      setMessage("Não foi possível processar essa imagem.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function selectProductImage(file?: File) {
+    if (!file) return;
+    setLoading(true);
+    try {
+      const image = await fileToOptimizedDataUrl(file);
+      setDraft((current) => ({ ...current, image }));
+    } catch {
+      setMessage("Não foi possível processar essa foto.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   if (authorized === null) return <main className="grid min-h-screen place-items-center bg-[#0a0605] text-white"><div className="animate-pulse font-black uppercase">Carregando painel...</div></main>;
 
   if (!authorized) return (
@@ -191,7 +249,16 @@ export default function AdminPage() {
           {tab === "settings" && <form onSubmit={saveSettings} className="rounded-2xl border border-white/10 bg-[#130d0d] p-5 md:p-6">
             <div className="mb-6"><h1 className="text-2xl font-black uppercase">Configurações</h1><p className="mt-1 text-sm text-white/45">WhatsApp, link da 99, banner, atendimento e informações da loja.</p></div>
             <div className="grid gap-4 md:grid-cols-2">
-              {settingFields.map(([key, label]) => <label key={key} className={key === "hero_subtitle" ? "md:col-span-2" : ""}><span className="text-xs font-black uppercase text-white/55">{label}</span>{key === "hero_subtitle" ? <textarea value={settings[key] || ""} onChange={(e) => setSettings({ ...settings, [key]: e.target.value })} className="mt-2 min-h-28 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 outline-none focus:border-[#d0102f]"/> : <input value={settings[key] || ""} onChange={(e) => setSettings({ ...settings, [key]: e.target.value })} className="mt-2 h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 outline-none focus:border-[#d0102f]"/>}</label>)}
+              {settingFields.map(([key, label]) => <label key={key} className={key === "hero_subtitle" || imageSettingKeys.has(key) ? "md:col-span-2" : ""}>
+                <span className="text-xs font-black uppercase text-white/55">{label}</span>
+                {key === "hero_subtitle" ? <textarea value={settings[key] || ""} onChange={(e) => setSettings({ ...settings, [key]: e.target.value })} className="mt-2 min-h-28 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 outline-none focus:border-[#d0102f]"/> : imageSettingKeys.has(key) ? <div className="mt-2 flex flex-col gap-3 rounded-xl border border-dashed border-white/15 bg-white/[.03] p-3 sm:flex-row sm:items-center">
+                  {settings[key] ? <img src={settings[key]} alt="Prévia" className="h-24 w-full rounded-lg bg-black/40 object-contain sm:w-40"/> : <div className="grid h-24 w-full place-items-center rounded-lg bg-black/25 text-xs text-white/35 sm:w-40">Sem imagem</div>}
+                  <div className="flex-1">
+                    <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => selectSettingImage(key, e.target.files?.[0])} className="block w-full text-xs text-white/60 file:mr-3 file:rounded-lg file:border-0 file:bg-[#d0102f] file:px-4 file:py-2.5 file:font-black file:text-white"/>
+                    <input value={settings[key]?.startsWith("data:") ? "" : settings[key] || ""} onChange={(e) => setSettings({ ...settings, [key]: e.target.value })} placeholder="ou cole a URL da imagem" className="mt-2 h-10 w-full rounded-lg border border-white/10 bg-white/5 px-3 text-xs outline-none focus:border-[#d0102f]"/>
+                  </div>
+                </div> : <input value={settings[key] || ""} onChange={(e) => setSettings({ ...settings, [key]: e.target.value })} className="mt-2 h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 outline-none focus:border-[#d0102f]"/>}
+              </label>)}
             </div>
             <button disabled={loading} className="mt-6 flex items-center gap-2 rounded-xl bg-[#d0102f] px-5 py-3 text-sm font-black uppercase disabled:opacity-50"><Save size={17}/> Salvar configurações</button>
           </form>}
@@ -205,7 +272,10 @@ export default function AdminPage() {
             <label><span className="text-xs font-black uppercase text-white/55">Nome</span><input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} required className="mt-2 h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 outline-none focus:border-[#d0102f]"/></label>
             <label><span className="text-xs font-black uppercase text-white/55">Categoria</span><input value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value })} required className="mt-2 h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 outline-none focus:border-[#d0102f]"/></label>
             <label className="md:col-span-2"><span className="text-xs font-black uppercase text-white/55">Descrição</span><textarea value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} className="mt-2 min-h-24 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 outline-none focus:border-[#d0102f]"/></label>
-            <label className="md:col-span-2"><span className="text-xs font-black uppercase text-white/55">URL da foto</span><input value={draft.image} onChange={(e) => setDraft({ ...draft, image: e.target.value })} className="mt-2 h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 outline-none focus:border-[#d0102f]"/></label>
+            <label className="md:col-span-2"><span className="text-xs font-black uppercase text-white/55">Foto do produto</span><div className="mt-2 flex flex-col gap-3 rounded-xl border border-dashed border-white/15 bg-white/[.03] p-3 sm:flex-row sm:items-center">
+              {draft.image ? <img src={draft.image} alt="Prévia do produto" className="h-24 w-full rounded-lg bg-black/40 object-contain sm:w-32"/> : <div className="grid h-24 w-full place-items-center rounded-lg bg-black/25 text-xs text-white/35 sm:w-32">Sem foto</div>}
+              <div className="flex-1"><input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => selectProductImage(e.target.files?.[0])} className="block w-full text-xs text-white/60 file:mr-3 file:rounded-lg file:border-0 file:bg-[#d0102f] file:px-4 file:py-2.5 file:font-black file:text-white"/><input value={draft.image.startsWith("data:") ? "" : draft.image} onChange={(e) => setDraft({ ...draft, image: e.target.value })} placeholder="ou cole a URL da imagem" className="mt-2 h-10 w-full rounded-lg border border-white/10 bg-white/5 px-3 text-xs outline-none focus:border-[#d0102f]"/></div>
+            </div></label>
             <label><span className="text-xs font-black uppercase text-white/55">Preço normal</span><input type="number" step="0.01" min="0" value={draft.price} onChange={(e) => setDraft({ ...draft, price: Number(e.target.value) })} required className="mt-2 h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 outline-none focus:border-[#d0102f]"/></label>
             <label><span className="text-xs font-black uppercase text-white/55">Preço promocional</span><input type="number" step="0.01" min="0" value={draft.promoPrice ?? ""} onChange={(e) => setDraft({ ...draft, promoPrice: e.target.value === "" ? null : Number(e.target.value) })} className="mt-2 h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 outline-none focus:border-[#d0102f]"/></label>
             <label><span className="text-xs font-black uppercase text-white/55">Ordem</span><input type="number" value={draft.sortOrder} onChange={(e) => setDraft({ ...draft, sortOrder: Number(e.target.value) })} className="mt-2 h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 outline-none focus:border-[#d0102f]"/></label>

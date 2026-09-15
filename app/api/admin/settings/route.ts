@@ -14,7 +14,12 @@ export async function GET() {
 export async function PATCH(request: Request) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   const body = await request.json();
-  const allowed = ["hero_title", "hero_subtitle", "hero_image", "whatsapp", "link99", "instagram", "address", "hours", "delivery_region", "min_order"];
+  const allowed = [
+    "hero_title", "hero_subtitle", "hero_image", "category_strip_image",
+    "promo_combo_image", "promo_beer_image", "promo_drinks_image",
+    "whatsapp", "link99", "instagram", "address", "hours",
+    "delivery_region", "min_order"
+  ];
   const entries = Object.entries(body).filter(([key]) => allowed.includes(key));
   await prisma.$transaction(entries.map(([key, value]) => prisma.setting.upsert({ where: { key }, update: { value: String(value ?? "") }, create: { key, value: String(value ?? "") } })));
   return NextResponse.json({ ok: true });
