@@ -153,10 +153,6 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
         <div className="absolute inset-0 bg-[linear-gradient(180deg,#070303_0%,#080303_45%,rgba(8,3,3,.35)_66%,rgba(0,0,0,.15)_100%)] md:bg-[linear-gradient(90deg,#050202_0%,#080303_38%,rgba(8,3,3,.78)_51%,rgba(8,3,3,.10)_76%,rgba(0,0,0,.06)_100%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_40%,rgba(255,0,30,.13),transparent_32%)]" />
 
-        <p className="neon-script pointer-events-none absolute right-[4%] top-[14%] z-10 -rotate-3 text-right text-[22px] leading-[.85] sm:right-[6%] sm:top-[16%] sm:text-[26px] md:right-[3%] md:top-[10%] md:text-[30px] lg:text-[34px]">
-          Bons<br/><b>Drinks</b><br/>Grandes<br/>Momentos!
-        </p>
-
         <div className="relative mx-auto flex max-w-[1024px] items-start justify-center px-4 pt-7 text-center sm:pt-8 md:min-h-[350px] md:items-center md:justify-start md:py-7 md:text-left lg:min-h-[325px] lg:px-8">
           <div className="max-w-[390px] md:max-w-[470px]">
             <h1 className="text-[31px] font-black leading-[.98] tracking-[-.035em] sm:text-[36px] md:text-[40px] lg:text-[43px]">
@@ -214,7 +210,7 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
 
         <div className="hide-scrollbar -mx-3 flex snap-x snap-mandatory gap-2 overflow-x-auto px-3 pb-1 sm:-mx-4 sm:px-4 lg:mx-0 lg:grid lg:grid-cols-3 lg:gap-3 lg:overflow-visible lg:px-0">
           <article className="relative min-h-[144px] min-w-[88%] snap-start overflow-hidden rounded-xl border border-white/10 bg-[#1a0808] p-4 sm:min-w-[56%] lg:min-w-0">
-            {settings.promo_combo_image ? <img src={settings.promo_combo_image} alt="" className="absolute right-0 top-0 h-full w-[46%] object-cover" /> : combo && <ProductImage product={combo} className="absolute right-0 top-0 h-full w-[46%] bg-transparent [&>span]:hidden [&>img]:p-0" />}
+            {settings.promo_combo_image ? <img src={settings.promo_combo_image} alt="" className="absolute right-0 top-0 h-full w-[46%] object-cover" /> : combo && <img src={combo.image} alt="" className="absolute right-0 top-0 h-full w-[46%] object-cover" onError={(e) => { e.currentTarget.style.display = "none"; }} />}
             <div className="relative z-10 max-w-[58%]">
               <h3 className="text-[17px] font-black uppercase leading-[.95] sm:text-[18px]">Combo do<br/><span className="text-[#ff1838]">fim de semana</span></h3>
               <p className="mt-2 text-[9px] leading-[14px] text-white/80 sm:text-[10px] sm:leading-4">1 Whisky Red Label<br/>+ 4 Energéticos<br/>+ Gelo Grátis</p>
