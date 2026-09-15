@@ -128,13 +128,18 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
 
       <section className="relative isolate min-h-[445px] overflow-hidden bg-[#130303] sm:min-h-[460px] md:min-h-[350px] lg:min-h-[325px]">
         <img
-          src="/hero-reference.webp"
-          alt="Bebidas geladas no gelo"
-          onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = settings.hero_image; }}
-          className="absolute bottom-0 left-0 h-[235px] w-full object-cover object-center opacity-95 [filter:saturate(1.06)_contrast(1.04)_brightness(.92)] sm:h-[255px] md:bottom-auto md:left-auto md:right-0 md:top-0 md:h-full md:w-[61%]"
+          src={settings.hero_image}
+          alt="Bebidas geladas em um balde de gelo"
+          loading="eager"
+          onError={(e) => { e.currentTarget.style.display = "none"; }}
+          className="absolute bottom-0 left-0 h-[235px] w-full object-cover object-[center_30%] opacity-95 [filter:saturate(1.06)_contrast(1.04)_brightness(.92)] sm:h-[255px] md:bottom-auto md:left-auto md:right-0 md:top-0 md:h-full md:w-[61%] md:object-[center_38%]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,#070303_0%,#080303_45%,rgba(8,3,3,.35)_66%,rgba(0,0,0,.15)_100%)] md:bg-[linear-gradient(90deg,#050202_0%,#080303_38%,rgba(8,3,3,.78)_51%,rgba(8,3,3,.10)_76%,rgba(0,0,0,.06)_100%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_40%,rgba(255,0,30,.13),transparent_32%)]" />
+
+        <p className="neon-script pointer-events-none absolute right-[4%] top-[14%] z-10 -rotate-3 text-right text-[22px] leading-[.85] sm:right-[6%] sm:top-[16%] sm:text-[26px] md:right-[3%] md:top-[10%] md:text-[30px] lg:text-[34px]">
+          Bons<br/><b>Drinks</b><br/>Grandes<br/>Momentos!
+        </p>
 
         <div className="relative mx-auto flex max-w-[1024px] items-start justify-center px-4 pt-7 text-center sm:pt-8 md:min-h-[350px] md:items-center md:justify-start md:py-7 md:text-left lg:min-h-[325px] lg:px-8">
           <div className="max-w-[390px] md:max-w-[470px]">

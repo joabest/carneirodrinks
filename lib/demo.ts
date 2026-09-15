@@ -27,7 +27,7 @@ export const demoProducts: StoreProduct[] = [
 export const demoSettings: StoreSettings = {
   hero_title: "Bebidas geladas, onde você estiver!",
   hero_subtitle: "Carneiro Drinks – Qualidade, variedade e entrega rápida para os seus melhores momentos.",
-  hero_image: "https://images.unsplash.com/photo-1527496726692-ee3caf2b259d?auto=format&fit=crop&fm=jpg&q=85&w=2000",
+  hero_image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&fm=jpg&q=85&w=2000",
   whatsapp: "5511999999999",
   link99: "https://99app.com/",
   instagram: "https://instagram.com/",
