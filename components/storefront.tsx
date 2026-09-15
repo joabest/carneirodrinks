@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Bike, ChevronDown, ChevronRight, Clock3, Home, Instagram, MapPin,
   Menu, MessageCircle, Minus, PackageCheck, Plus, Search, ShieldCheck,
@@ -22,6 +22,14 @@ const fallbackEmoji: Record<string, string> = {
   Cervejas: "🍺", Whisky: "🥃", Vodka: "🍾", Gin: "🍸", Destilados: "🥃",
   Energéticos: "⚡", Refrigerantes: "🥤", Sucos: "🧃", Água: "💧",
   Gelo: "🧊", Drinks: "🍸", Combos: "🎁", Promoções: "🏷️"
+};
+
+const categoryImageKeys: Record<string, string> = {
+  Cervejas: "category_cervejas", Whisky: "category_whisky", Vodka: "category_vodka",
+  Gin: "category_gin", Destilados: "category_destilados", Energéticos: "category_energeticos",
+  Refrigerantes: "category_refrigerantes", Sucos: "category_sucos", Água: "category_agua",
+  Gelo: "category_gelo", Drinks: "category_drinks", Combos: "category_combos",
+  Promoções: "category_promocoes"
 };
 
 function money(value: number) {
@@ -49,6 +57,14 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
   const [query, setQuery] = useState("");
   const [cartOpen, setCartOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const heroImages = [settings.hero_image, settings.hero_image_2, settings.hero_image_3].filter(Boolean);
+  const [heroIndex, setHeroIndex] = useState(0);
+
+  useEffect(() => {
+    if (heroImages.length < 2) return;
+    const timer = window.setInterval(() => setHeroIndex((current) => (current + 1) % heroImages.length), 5500);
+    return () => window.clearInterval(timer);
+  }, [heroImages.length]);
 
   const filtered = useMemo(() => initialProducts.filter((p) => {
     const cat = category === "Todos" || category === "Promoções"
@@ -128,7 +144,7 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
 
       <section className="relative isolate min-h-[445px] overflow-hidden bg-[#130303] sm:min-h-[460px] md:min-h-[350px] lg:min-h-[325px]">
         <img
-          src={settings.hero_image || "/hero-reference.webp"}
+          src={heroImages[heroIndex] || "/hero-reference.webp"}
           alt="Bebidas geladas em um balde de gelo"
           loading="eager"
           onError={(e) => { e.currentTarget.style.display = "none"; }}
@@ -171,19 +187,14 @@ export default function Storefront({ initialProducts, settings }: { initialProdu
                 onClick={() => goCatalog(name)}
                 className={"min-w-[74px] rounded-xl px-2 py-2 text-center transition " + (category === name ? "bg-[#fff0f2] text-[#ff1838]" : "bg-white")}
               >
-                <span className="block text-[21px] leading-6">{icon}</span>
+                {settings[categoryImageKeys[name]] ? <img src={settings[categoryImageKeys[name]]} alt="" className="mx-auto h-7 w-8 object-contain"/> : <span className="block text-[21px] leading-6">{icon}</span>}
                 <span className={"mt-1 block whitespace-nowrap text-[9px] font-semibold " + (category === name ? "border-b-2 border-[#ff1838] pb-1" : "")}>{name}</span>
               </button>
             ))}
           </div>
 
           <div className="relative hidden overflow-hidden rounded-2xl bg-white shadow-[0_14px_45px_rgba(0,0,0,.45)] lg:block">
-            <img src={settings.category_strip_image || "/categories-reference.webp"} alt="Categorias de bebidas Carneiro Drinks" className="block h-auto w-full select-none" draggable={false} />
-            <div className="absolute inset-0 grid" style={{ gridTemplateColumns: "repeat(13,minmax(0,1fr))" }}>
-              {categories.map(([name]) => (
-                <button key={name} onClick={() => goCatalog(name)} aria-label={"Ver " + name} className="h-full w-full bg-transparent" />
-              ))}
-            </div>
+            {categories.some(([name]) => settings[categoryImageKeys[name]]) ? <div className="grid h-[87px] grid-cols-[repeat(13,minmax(0,1fr))] text-black">{categories.map(([name, icon]) => <button key={name} onClick={() => goCatalog(name)} className="grid place-items-center border-r border-black/5 px-1 py-2 last:border-0"><span>{settings[categoryImageKeys[name]] ? <img src={settings[categoryImageKeys[name]]} alt="" className="h-9 w-11 object-contain"/> : <span className="text-2xl">{icon}</span>}</span><span className="text-[9px] font-semibold">{name}</span></button>)}</div> : <><img src={settings.category_strip_image || "/categories-reference.webp"} alt="Categorias de bebidas Carneiro Drinks" className="block h-auto w-full select-none" draggable={false} /><div className="absolute inset-0 grid" style={{ gridTemplateColumns: "repeat(13,minmax(0,1fr))" }}>{categories.map(([name]) => <button key={name} onClick={() => goCatalog(name)} aria-label={"Ver " + name} className="h-full w-full bg-transparent" />)}</div></>}
           </div>
         </div>
       </section>

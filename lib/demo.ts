@@ -28,6 +28,8 @@ export const demoSettings: StoreSettings = {
   hero_title: "Bebidas geladas, onde você estiver!",
   hero_subtitle: "Carneiro Drinks – Qualidade, variedade e entrega rápida para os seus melhores momentos.",
   hero_image: "/hero-reference.webp",
+  hero_image_2: "",
+  hero_image_3: "",
   category_strip_image: "/categories-reference.webp",
   promo_combo_image: "",
   promo_beer_image: "",

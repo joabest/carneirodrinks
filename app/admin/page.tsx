@@ -36,10 +36,25 @@ const settingFields = [
   ["hero_title", "Título principal"],
   ["hero_subtitle", "Texto do banner"],
   ["hero_image", "Banner principal"],
+  ["hero_image_2", "Banner rotativo 2"],
+  ["hero_image_3", "Banner rotativo 3"],
   ["category_strip_image", "Faixa com imagens das categorias"],
   ["promo_combo_image", "Imagem da promoção: combo"],
   ["promo_beer_image", "Imagem da promoção: cervejas"],
   ["promo_drinks_image", "Imagem da promoção: drinks"],
+  ["category_cervejas", "Categoria: Cervejas"],
+  ["category_whisky", "Categoria: Whisky"],
+  ["category_vodka", "Categoria: Vodka"],
+  ["category_gin", "Categoria: Gin"],
+  ["category_destilados", "Categoria: Destilados"],
+  ["category_energeticos", "Categoria: Energéticos"],
+  ["category_refrigerantes", "Categoria: Refrigerantes"],
+  ["category_sucos", "Categoria: Sucos"],
+  ["category_agua", "Categoria: Água"],
+  ["category_gelo", "Categoria: Gelo"],
+  ["category_drinks", "Categoria: Drinks"],
+  ["category_combos", "Categoria: Combos"],
+  ["category_promocoes", "Categoria: Promoções"],
   ["whatsapp", "WhatsApp com DDI + DDD"],
   ["link99", "Link oficial da 99"],
   ["instagram", "Link do Instagram"],
@@ -50,8 +65,12 @@ const settingFields = [
 ] as const;
 
 const imageSettingKeys = new Set([
-  "hero_image", "category_strip_image", "promo_combo_image",
-  "promo_beer_image", "promo_drinks_image"
+  "hero_image", "hero_image_2", "hero_image_3", "category_strip_image",
+  "promo_combo_image", "promo_beer_image", "promo_drinks_image",
+  "category_cervejas", "category_whisky", "category_vodka", "category_gin",
+  "category_destilados", "category_energeticos", "category_refrigerantes",
+  "category_sucos", "category_agua", "category_gelo", "category_drinks",
+  "category_combos", "category_promocoes"
 ]);
 
 async function fileToOptimizedDataUrl(file: File) {

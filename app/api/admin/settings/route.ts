@@ -20,7 +20,7 @@ export async function PATCH(request: Request) {
     "whatsapp", "link99", "instagram", "address", "hours",
     "delivery_region", "min_order"
   ];
-  const entries = Object.entries(body).filter(([key]) => allowed.includes(key));
+  const entries = Object.entries(body).filter(([key]) => allowed.includes(key) || key.startsWith("category_") || key === "hero_image_2" || key === "hero_image_3");
   await prisma.$transaction(entries.map(([key, value]) => prisma.setting.upsert({ where: { key }, update: { value: String(value ?? "") }, create: { key, value: String(value ?? "") } })));
   return NextResponse.json({ ok: true });
 }
